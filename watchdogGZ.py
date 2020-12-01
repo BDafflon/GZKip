@@ -12,7 +12,7 @@ path_to_caesiumclt_exe = "./caesiumclt/caesiumclt.exe"
 folder_to_watch = "."
 compress_existing_images = False  # Can be True or False
 compression_factor = 80  # 0 = lossless, 80 most common
-wait_time_between_checks = 30  # seconds
+wait_time_between_checks = 5  # seconds
 
 # --- Don't modify anything beyond this point ---
 
@@ -30,8 +30,9 @@ def updateLog():
     a_file.close()
 
 def compress_images():
-    for f in fileList:
-        if fileList[f] == "waiting":
+    new_list = fileList.copy()
+    for f in new_list:
+        if new_list[f] == "waiting":
             try:
                 cmd_line = '{} -q {} -e -o "{}" "{}"'.format(path_to_caesiumclt_exe, compression_factor, folder_to_watch, f)
                 logging.info("Compressing {}...".format(f))
