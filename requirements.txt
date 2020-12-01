@@ -1,0 +1,4 @@
+image==1.5.33
+pathtools==0.1.2
+Pillow==8.0.1
+watchdog==0.10.4
