@@ -31,22 +31,26 @@ def updateLog():
 
 def compress_images():
     new_list = fileList.copy()
-    for f in new_list:
-        if new_list[f] == "waiting":
-            try:
-                cmd_line = '{} -q {} -e -o "{}" "{}"'.format(path_to_caesiumclt_exe, compression_factor, folder_to_watch, f)
-                logging.info("Compressing {}...".format(f))
-                res = subprocess.run(cmd_line, capture_output=True)
-                logging.info(res.stdout.decode())
-                if res.returncode != 0:
-                    logging.error("Compression of {} failed with code {}".format(f, res.returncode))
-                    fileList[f] = "error"
-                else:
-                    logging.info("Compression successful!")
-                    fileList[f] = "done"
-            except Exception as e:
-                fileList["caesiumcltException"] = str(e)
-                updateLog()
+    try:
+        for f in new_list:
+            if new_list[f] == "waiting":
+                try:
+                    cmd_line = '{} -q {} -e -o "{}" "{}"'.format(path_to_caesiumclt_exe, compression_factor, folder_to_watch, f)
+                    logging.info("Compressing {}...".format(f))
+                    res = subprocess.run(cmd_line, capture_output=True)
+                    logging.info(res.stdout.decode())
+                    if res.returncode != 0:
+                        logging.error("Compression of {} failed with code {}".format(f, res.returncode))
+                        fileList[f] = "error"
+                    else:
+                        logging.info("Compression successful!")
+                        fileList[f] = "done"
+                except Exception as e:
+                    fileList["caesiumcltException"] = str(e)
+                    updateLog()
+        updateLog()
+    except Exception as e:
+        fileList["Exception"] = str(e)
         updateLog()
 
 
