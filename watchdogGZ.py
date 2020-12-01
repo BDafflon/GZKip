@@ -23,7 +23,6 @@ logging.captureWarnings(True)
 fileList = []
 
 def updateLog():
-    print(fileList)
     a_file = open(".log/watchdog.json", "w")
     json.dump(fileList, a_file)
     a_file.close()
