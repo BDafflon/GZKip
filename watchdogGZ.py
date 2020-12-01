@@ -13,6 +13,7 @@ folder_to_watch = "."
 compress_existing_images = False  # Can be True or False
 compression_factor = 80  # 0 = lossless, 80 most common
 wait_time_between_checks = 30  # seconds
+
 # --- Don't modify anything beyond this point ---
 
 
@@ -23,6 +24,7 @@ logging.captureWarnings(True)
 fileList = []
 
 def updateLog():
+    print(fileList)
     a_file = open(".log/watchdog.json", "w")
     json.dump(fileList, a_file)
     a_file.close()
@@ -30,16 +32,20 @@ def updateLog():
 def compress_images():
     for f in fileList:
         if fileList[f] == "waiting":
-            cmd_line = '{} -q {} -e -o "{}" "{}"'.format(path_to_caesiumclt_exe, compression_factor, folder_to_watch, f)
-            logging.info("Compressing {}...".format(f))
-            res = subprocess.run(cmd_line, capture_output=True)
-            logging.info(res.stdout.decode())
-            if res.returncode != 0:
-                logging.error("Compression of {} failed with code {}".format(f, res.returncode))
-                fileList[f] = "error"
-            else:
-                logging.info("Compression successful!")
-                fileList[f] = "done"
+            try:
+                cmd_line = '{} -q {} -e -o "{}" "{}"'.format(path_to_caesiumclt_exe, compression_factor, folder_to_watch, f)
+                logging.info("Compressing {}...".format(f))
+                res = subprocess.run(cmd_line, capture_output=True)
+                logging.info(res.stdout.decode())
+                if res.returncode != 0:
+                    logging.error("Compression of {} failed with code {}".format(f, res.returncode))
+                    fileList[f] = "error"
+                else:
+                    logging.info("Compression successful!")
+                    fileList[f] = "done"
+            except Exception as e:
+                fileList["caesiumcltException"] = str(e)
+                updateLog()
         updateLog()
 
 
@@ -99,6 +105,8 @@ if __name__ == "__main__":
         while True:
             time.sleep(wait_time_between_checks)
             compress_images()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
         my_observer.stop()
         my_observer.join()
+        fileList["KeyboardInterrupt"]=str(e)
+        updateLog()
